@@ -109,7 +109,7 @@ def apply_lm(parentBeam, childBeam, spaceIx, lm):
     """
 
     if not (childBeam.lmApplied):
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
         if parentBeam.lmState == None:
             initStateBatch = None
             inputBatch = torch.tensor(spaceIx-1).reshape(1,1)

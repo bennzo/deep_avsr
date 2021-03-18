@@ -24,7 +24,7 @@ def main():
     np.random.seed(args["SEED"])
     torch.manual_seed(args["SEED"])
     gpuAvailable = torch.cuda.is_available()
-    device = torch.device("cuda" if gpuAvailable else "cpu")
+    device = torch.device("cuda:1" if gpuAvailable else "cpu")
     kwargs = {"num_workers":args["NUM_WORKERS"], "pin_memory":True} if gpuAvailable else {}
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False

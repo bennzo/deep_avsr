@@ -20,7 +20,7 @@ from data.lrs2_dataset import LRS2Pretrain
 from data.utils import collate_fn
 from utils.general import num_params, train, evaluate
 
-
+# os.environ["CUDA_VISIBLE_DEVICES"] = '0,1,2,3'
 
 def main():
 
@@ -47,6 +47,7 @@ def main():
     #declaring the model, optimizer, scheduler and the loss function
     model = VideoNet(args["TX_NUM_FEATURES"], args["TX_ATTENTION_HEADS"], args["TX_NUM_LAYERS"], args["PE_MAX_LENGTH"],
                      args["TX_FEEDFORWARD_DIM"], args["TX_DROPOUT"], args["NUM_CLASSES"])
+    # model = nn.DataParallel(model, device_ids=[0, 1])
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=args["INIT_LR"], betas=(args["MOMENTUM1"], args["MOMENTUM2"]))
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=args["LR_SCHEDULER_FACTOR"],
@@ -76,6 +77,7 @@ def main():
     if args["PRETRAINED_MODEL_FILE"] is not None:
         print("\n\nPre-trained Model File: %s" %(args["PRETRAINED_MODEL_FILE"]))
         print("\nLoading the pre-trained model .... \n")
+        # model.module.load_state_dict(torch.load(args["CODE_DIRECTORY"] + args["PRETRAINED_MODEL_FILE"], map_location=device))   # DataParallel
         model.load_state_dict(torch.load(args["CODE_DIRECTORY"] + args["PRETRAINED_MODEL_FILE"], map_location=device))
         model.to(device)
         print("Loading Done.\n")
@@ -122,8 +124,10 @@ def main():
         #saving the model weights and loss/metric curves in the checkpoints directory after every few steps
         if ((step%args["SAVE_FREQUENCY"] == 0) or (step == args["NUM_STEPS"]-1)) and (step != 0):
 
+            # TODO: Add save best model
             savePath = args["CODE_DIRECTORY"] + "/checkpoints/models/pretrain_{:03d}w-step_{:04d}-wer_{:.3f}.pt".format(args["PRETRAIN_NUM_WORDS"],
                                                                                                                         step, validationWER)
+            # torch.save(model.module.state_dict(), savePath)     # DataParallel
             torch.save(model.state_dict(), savePath)
 
             plt.figure()

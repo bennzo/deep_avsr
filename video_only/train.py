@@ -118,6 +118,16 @@ def main():
         #make a scheduler step
         scheduler.step(validationWER)
 
+        #saving the model with the lower WER
+        if len(validationWERCurve) == 1 or validationWER < min(validationWERCurve[:-1]):
+            #remove previous best
+            if len(validationWERCurve) > 1:
+                os.remove(savePathBest)
+
+            savePathBest = args["CODE_DIRECTORY"] + "/checkpoints/models/pretrain_{:03d}w-step_{:04d}-wer_{:.3f}_best.pt".format(args["PRETRAIN_NUM_WORDS"],
+                                                                                                                                 step,
+                                                                                                                                 validationWER)
+            torch.save(model.state_dict(), savePathBest)
 
         #saving the model weights and loss/metric curves in the checkpoints directory after every few steps
         if ((step%args["SAVE_FREQUENCY"] == 0) or (step == args["NUM_STEPS"]-1)) and (step != 0):

@@ -12,8 +12,9 @@ args = dict()
 args["CODE_DIRECTORY"] = "/home/access/workspace/repos/deep_avsr/video_only"   #absolute path to the code directory
 args["DATA_DIRECTORY"] = "/home/access/workspace/data/LipReading/LRS2"   #absolute path to the data directory
 args["DEMO_DIRECTORY"] = "/home/access/workspace/repos/deep_avsr/video_only/demo"   #absolute path to the demo directory
-args["PRETRAINED_MODEL_FILE"] = "/checkpoints_curriculum/20210308-162509/37/models/pretrain_037w-step_0005-wer_0.916_best.pt" #"final/models/video-only.pt"     #relative path to the pretrained model file
-args["TRAINED_MODEL_FILE"] = "/checkpoints/models/pretrain_001w-step_0230-wer_0.806_best.pt" #"/final/models/video-only.pt"   #relative path to the trained model file
+args["CP_DIRECTORY"] = "/checkpoints_curriculum"      #relative path to the checkpoints directory
+args["PRETRAINED_MODEL_FILE"] = None #"/curriculum/pretrain_017w-step_0380-wer_0.832.pt" #"/final/models/video-only.pt"     #relative path to the pretrained model file
+args["TRAINED_MODEL_FILE"] = "/final/models/video-only.pt"   #relative path to the trained model file
 args["TRAINED_LM_FILE"] = "/home/access/workspace/repos/deep_avsr/language_model.pt"  #absolute path to the trained language model file
 args["TRAINED_FRONTEND_FILE"] = "/home/access/workspace/repos/deep_avsr/visual_frontend.pt" #absolute path to the trained visual frontend file
 
@@ -31,6 +32,7 @@ args["INDEX_TO_CHAR"] = {1:" ", 22:"'", 30:"1", 29:"0", 37:"3", 32:"2", 34:"5", 
                          5:"A", 17:"C", 20:"B", 2:"E", 12:"D", 16:"G", 19:"F", 6:"I", 9:"H", 24:"K", 25:"J", 18:"M",
                          11:"L", 4:"O", 7:"N", 27:"Q", 21:"P", 8:"S", 10:"R", 13:"U", 3:"T", 15:"W", 23:"V", 14:"Y",
                          26:"X", 28:"Z", 39:"<EOS>"}    #index to character reverse mapping
+args["PRETRAIN"] = True
 
 
 #preprocessing
@@ -44,8 +46,11 @@ args["NORMALIZATION_STD"] = 0.1688  #standard deviation value for normalization 
 args["SEED"] = 19220297 #seed for random number generators
 args["BATCH_SIZE"] = 32 #minibatch size
 args["STEP_SIZE"] = 16384   #number of samples in one step (virtual epoch)
-args["NUM_STEPS"] = 1000 #maximum number of steps to train for (early stopping is used)
+args["NUM_STEPS"] = 3 #maximum number of steps to train for (early stopping is used)
 args["SAVE_FREQUENCY"] = 10 #saving the model weights and loss/metric plots after every these many steps
+
+#lightning acceleration
+args["ACCELERATOR"] = 'ddp' #accelerator for pytorch lightning training module
 
 
 #optimizer and scheduler
@@ -56,6 +61,7 @@ args["LR_SCHEDULER_WAIT"] = 25  #number of steps to wait to lower learning rate
 args["LR_SCHEDULER_THRESH"] = 0.001 #threshold to check plateau-ing of wer
 args["MOMENTUM1"] = 0.9 #optimizer momentum 1 value
 args["MOMENTUM2"] = 0.999   #optimizer momentum 2 value
+args["WEIGHT_DECAY"] = 1e-5
 
 
 #model
@@ -68,19 +74,19 @@ args["TX_NUM_FEATURES"] = 512   #transformer input feature size
 args["TX_ATTENTION_HEADS"] = 8  #number of attention heads in multihead attention layer
 args["TX_NUM_LAYERS"] = 6   #number of Transformer Encoder blocks in the stack
 args["TX_FEEDFORWARD_DIM"] = 2048   #hidden layer size in feedforward network of transformer
-args["TX_DROPOUT"] = 0.1    #dropout probability in the transformer
+args["TX_DROPOUT"] = 0.1 #0.3    #dropout probability in the transformer
 
 
 #beam search
-args["BEAM_WIDTH"] = 5    #beam width
+args["BEAM_WIDTH"] = 100    #beam width
 args["LM_WEIGHT_ALPHA"] = 0.5   #weight of language model probability in shallow fusion beam scoring
 args["LENGTH_PENALTY_BETA"] = 0.1   #length penalty exponent hyperparameter
 args["THRESH_PROBABILITY"] = 0.0001 #threshold probability in beam search algorithm
-args["USE_LM"] = True  #whether to use language model for decoding
+args["USE_LM"] = False  #whether to use language model for decoding
 
 
 #testing
-args["TEST_DEMO_DECODING"] = "search"   #test/demo decoding type - "greedy" or "search"
+args["TEST_DEMO_DECODING"] = "greedy"   #test/demo decoding type - "greedy" or "search"
 
 
 if __name__ == "__main__":
